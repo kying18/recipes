@@ -5,6 +5,7 @@
 # Jupyter notebook in python form to run on a cluster :)
 ###########################################################################
 
+import sys
 import pickle as pkl
 import numpy as np
 import pandas as pd
@@ -255,34 +256,48 @@ def run_nn(params, args, tensors, nn_model_type=TwoHiddenNN):
 
     return model, train_losses, train_accuracies, valid_loss, valid_accuracy
 
-def train_and_validate(params, args, tensors):
+def train_and_validate(hidden_layer_count, params, args, tensors):
     # we will vary # of hidden layers, # of nodes in hidden layers, learning rate
-    num_hidden_layers = [2, 3]
-    lrs = [0.01, 0.001, 0.0001]
-    num_hidden_nodes = [100, 500, 1000, NUM_INGREDIENTS, 2*NUM_INGREDIENTS]
+    lr = params["lr"]
+    # num_hidden_layers = [2, 3]
+    # lrs = [0.01, 0.001, 0.0001]
+    if hidden_layer_count == 2:
+        num_hidden_nodes = [100, 500, 1000, NUM_INGREDIENTS]
+    elif hidden_layer_count == 3:
+        num_hidden_nodes = [100, 500, 1000]
+
     results = {}
-    for hidden_layer_count in num_hidden_layers:
-        results[hidden_layer_count] = results.get(hidden_layer_count, {})
-        for lr in lrs:
-            results[hidden_layer_count][lr] = results[hidden_layer_count].get(lr, {})
-            params["lr"] = lr
-            for hidden_1 in num_hidden_nodes:
-                params["hidden_1"] = hidden_1
-                for hidden_2 in num_hidden_nodes:
-                    params["hidden_2"] = hidden_2
-                    if hidden_layer_count == 2:
-                        results[hidden_layer_count][lr][(hidden_1, hidden_2)] = run_nn(params, args, tensors, TwoHiddenNN)
-                    elif hidden_layer_count == 3:
-                        for hidden_3 in num_hidden_nodes:
-                            params["hidden_3"] = hidden_3
-                            results[hidden_layer_count][lr][(hidden_1, hidden_2, hidden_3)] = run_nn(params, args, tensors, ThreeHiddenNN)
+    
+    results[hidden_layer_count] = {lr: {}}
+    # for hidden_layer_count in num_hidden_layers:
+    #     results[hidden_layer_count] = results.get(hidden_layer_count, {})
+    #     for lr in lrs:
+    #         results[hidden_layer_count][lr] = results[hidden_layer_count].get(lr, {})
+    #             params["lr"] = lr
+    for hidden_1 in num_hidden_nodes:
+        params["hidden_1"] = hidden_1
+        for hidden_2 in num_hidden_nodes:
+            params["hidden_2"] = hidden_2
+            if hidden_layer_count == 2:
+                results[hidden_layer_count][lr][(hidden_1, hidden_2)] = run_nn(params, args, tensors, TwoHiddenNN)
+            elif hidden_layer_count == 3:
+                for hidden_3 in num_hidden_nodes:
+                    params["hidden_3"] = hidden_3
+                    results[hidden_layer_count][lr][(hidden_1, hidden_2, hidden_3)] = run_nn(params, args, tensors, ThreeHiddenNN)
 
     return results
 
 if __name__ == "__main__":
+    hidden_layer_count = int(sys.argv[1])
+    lr = float(sys.argv[2])
+    print(hidden_layer_count, lr)
+
     tensors = get_data(dataset_size=100000)
-    results = train_and_validate(PARAMS, ARGS, tensors)
+    # tensors = get_data(dataset_size=100)
+    
+    PARAMS["lr"] = lr
+    results = train_and_validate(hidden_layer_count, PARAMS, ARGS, tensors)
 
     # write this data to pickle so we don't have to go through this brutal process again
-    with open("nn_train_valid_results.pkl", "wb") as f:
+    with open(f"nn_train_valid_results_{hidden_layer_count}_{lr}.pkl", "wb+") as f:
         pkl.dump(results, f)

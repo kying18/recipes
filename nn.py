@@ -262,9 +262,23 @@ def train_and_validate(hidden_layer_count, params, args, tensors):
     # num_hidden_layers = [2, 3]
     # lrs = [0.01, 0.001, 0.0001]
     if hidden_layer_count == 2:
-        num_hidden_nodes = [100, 500, 1000, NUM_INGREDIENTS]
+        num_hidden_nodes = [
+            (200, 200, 0),
+            (500, 500, 0),
+            (1000, 1000, 0),
+            (1500, 1500, 0),
+            (NUM_INGREDIENTS, NUM_INGREDIENTS, 0),
+            (1000, 1500, 0)
+        ]
     elif hidden_layer_count == 3:
-        num_hidden_nodes = [100, 500, 1000]
+        num_hidden_nodes = [
+            (200, 200, 200),
+            (500, 500, 500),
+            (1000, 1000, 1000),
+            (1000, 1500, 1500),
+            (1500, 1500, 1500),
+            (NUM_INGREDIENTS, NUM_INGREDIENTS, NUM_INGREDIENTS)
+        ]
 
     results = {}
     
@@ -274,16 +288,20 @@ def train_and_validate(hidden_layer_count, params, args, tensors):
     #     for lr in lrs:
     #         results[hidden_layer_count][lr] = results[hidden_layer_count].get(lr, {})
     #             params["lr"] = lr
-    for hidden_1 in num_hidden_nodes:
+    for hidden_1, hidden_2, hidden_3 in num_hidden_nodes:
         params["hidden_1"] = hidden_1
-        for hidden_2 in num_hidden_nodes:
-            params["hidden_2"] = hidden_2
-            if hidden_layer_count == 2:
-                results[hidden_layer_count][lr][(hidden_1, hidden_2)] = run_nn(params, args, tensors, TwoHiddenNN)
-            elif hidden_layer_count == 3:
-                for hidden_3 in num_hidden_nodes:
-                    params["hidden_3"] = hidden_3
-                    results[hidden_layer_count][lr][(hidden_1, hidden_2, hidden_3)] = run_nn(params, args, tensors, ThreeHiddenNN)
+        params["hidden_2"] = hidden_2
+        params["hidden_3"] = hidden_3
+
+        # params["hidden_1"] = hidden_1
+        # for hidden_2 in num_hidden_nodes:
+        #     params["hidden_2"] = hidden_2
+        if hidden_layer_count == 2:
+            results[hidden_layer_count][lr][(hidden_1, hidden_2)] = run_nn(params, args, tensors, TwoHiddenNN)
+        elif hidden_layer_count == 3:
+            # for hidden_3 in num_hidden_nodes:
+            #     params["hidden_3"] = hidden_3
+            results[hidden_layer_count][lr][(hidden_1, hidden_2, hidden_3)] = run_nn(params, args, tensors, ThreeHiddenNN)
 
     return results
 
@@ -292,8 +310,8 @@ if __name__ == "__main__":
     lr = float(sys.argv[2])
     print(hidden_layer_count, lr)
 
-    tensors = get_data(dataset_size=100000)
-    # tensors = get_data(dataset_size=100)
+    # tensors = get_data(dataset_size=100000)
+    tensors = get_data(dataset_size=10)
     
     PARAMS["lr"] = lr
     results = train_and_validate(hidden_layer_count, PARAMS, ARGS, tensors)

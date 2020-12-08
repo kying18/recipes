@@ -322,23 +322,24 @@ if __name__ == "__main__":
 #         pkl.dump(results, f)
 
     # TESTING NN
-    _, _, test_tensor, _ = get_data(dataset_size=100000)
-    with open("models.pkl", "rb") as f:
-        nn200, nn3500 = pkl.load(f)
+    # _, _, test_tensor, _ = get_data(dataset_size=100000)
+    # with open("models.pkl", "rb") as f:
+    #     nn200, nn3500 = pkl.load(f)
         
-    nn200_model, nn200_losses, nn200_accs, nn200_valid_loss, nn200_valid_acc = nn200
-    nn3500_model, nn3500_losses, nn3500_accs, nn3500_valid_loss, nn3500_valid_acc = nn3500
+    # nn200_model, nn200_losses, nn200_accs, nn200_valid_loss, nn200_valid_acc = nn200
+    # nn3500_model, nn3500_losses, nn3500_accs, nn3500_valid_loss, nn3500_valid_acc = nn3500
 
-    use_cuda = not ARGS["no_cuda"] and torch.cuda.is_available()
-    device = torch.device("cuda" if use_cuda else "cpu")
-    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
-    test_loader = torch.utils.data.DataLoader(
-        test_tensor,
-        batch_size=ARGS["batch_size"], shuffle=True, **kwargs)
+    # use_cuda = not ARGS["no_cuda"] and torch.cuda.is_available()
+    # device = torch.device("cuda" if use_cuda else "cpu")
+    # kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
+    # test_loader = torch.utils.data.DataLoader(
+    #     test_tensor,
+    #     batch_size=ARGS["batch_size"], shuffle=True, **kwargs)
     
-    nn200_test_loss, nn200_test_acc = test(nn200_model, device, test_loader)
-    nn3500_test_loss, nn3500_test_acc = test(nn3500_model, device, test_loader)
+    # nn200_test_loss, nn200_test_acc = test(nn200_model, device, test_loader)
+    # nn3500_test_loss, nn3500_test_acc = test(nn3500_model, device, test_loader)
     
-    print(f"nn200 loss: {nn200_test_loss}, acc: {nn200_test_acc}")
-    print(f"nn3500 loss: {nn3500_test_loss}, acc: {nn3500_test_acc}")
-    
+    # print(f"nn200 loss: {nn200_test_loss}, acc: {nn200_test_acc}")
+    # print(f"nn3500 loss: {nn3500_test_loss}, acc: {nn3500_test_acc}")
+    sushi = [1277, 313, 512, 252, 2039, 56]
+    mex = [288, 55, 214, 1007, 1077, 2883, 21, 6, 0, 182]
